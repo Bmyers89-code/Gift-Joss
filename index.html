@@ -1,0 +1,188 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="style.css">
+ 
+<div id="login">
+  <input id="nombre" placeholder="Tu nombre">
+  <input id= "clave" placeholder="Codigo">
+  <button onclick="entrar()">Entrar</button>
+</div>
+
+<div id= "pantalla">
+  <h1> ¡Feliz Cumpleaños, Joss!</h1>
+  <div class= "caja">
+    <div class="ruleta" id="ruleta"></div>
+    <div class="marca"></div>
+  </div>
+  <div id="info"></div>
+</div>
+
+<div class="carta" id="textoCarta">
+  <h2>Para ti 💌</h2>
+  <p>Hola,joss.
+  <p>Antes que nada ¡Feliz Cumpleaños! :) </p>
+<p>La verdad, es una de las primeras veces que hago un regalo así, y sí se me dificultó, a pesar de la ayuda que recibí de la IA para poder hacer esta idea que se me ocurrió hace tiempo. Espero te guste. Me siento un poco culpable de no saberle bien y de recibir tanta ayuda de la IA, JAJAJA, detalles...</p>
+<p>TQM, Joss. Me es difícil expresarme así, supongo, pero siendo sincero contigo, siento que sí me puedo empezar a abrir. Me gustaría decir todo lo que pienso, pero me da miedo incomodar. Y además estoy escribiendo esto a las 2:43 a. m. del 18 de octubre de 2026, y al escribirlo me di cuenta de que ya es el cumpleaños de Pacheco, jajaja. Supongo que después de terminar esto lo felicitaré.</p>
+<p>Hay veces en las que digo las cosas en voz alta y me salen mal o contrarias a lo que me hubiera gustado. Así que espero seguir teniendo tu confianza y amistad durante mucho tiempo.</p>
+<p>Aunque sea malo para expresar cariño, espero que lo sientas a través de esto que hice.</p>
+  <button onclick="abrirCarta()">Cerrar</button>
+</div>
+
+
+<script>
+  var items = [
+  { titulo: "Friendly", texto: "Friendly Hallucinations", fondo: "#12304d", imagen: "portada.jpg", audio:"audio1.mp3" },
+  { titulo: "Stoned", texto: "Stoned", fondo: "#3d1a4f", imagen: "portada.jpg", audio: "audio2.mp3" },
+  { titulo: "Tomorrow", texto: "Tomorrow Will Never Know", fondo: "#4f2a12", imagen: "portada.jpg", audio: "audio3.mp3"},
+  { titulo: "Funny Papers", texto: "Funny Papers", fondo: "#123f2a", imagen: "portada.jpg", audio:"audio4.mp3" },
+  { titulo: "Carta 💌", texto: '<div class="sobre" onclick="abrirCarta ()">💌</div>', fondo: "#000000" }
+];
+  var rot= 0;
+  var ultimo= 0;
+  var arrastrando= false;
+  var sonido=null;
+
+  function entrar() {
+    var nombre=document.getElementById("nombre").value.trim().toLowerCase();
+    var clave=document.getElementById("clave").value.trim().toLowerCase();
+    if ((nombre == "0" || nombre == "joss") && (clave === "0" || clave === "191007")) {
+      document.getElementById("login").style.display ="none";
+      document.getElementById("pantalla").style.display="flex";
+      lluvia ();
+      setTimeout( function () {
+        var r=document.querySelectorAll(".rayo");
+        for(var i=0; i< r.length; i++) {
+          r[i].style.opacity=0;
+        }
+      } ,4000);
+      armarRuleta();
+      activarRuleta();
+     }else{
+      alert("Nombre o codigo incorrecto");
+    }
+  }
+    function lluvia() {
+    var p = document.getElementById("pantalla");
+    for (var i = 0; i < 30; i++) {
+      var l = document.createElement("div");
+      l.className = "rayo";
+      l.style.left = Math.random() * 100 + "%";
+      l.style.animationDuration = (1.5 + Math.random() * 2.5) + "s";
+      l.style.animationDelay = (Math.random() * 3) + "s";
+      p.insertBefore(l, p.firstChild);
+    }
+  }
+
+  function armarRuleta() {
+    var r = document.getElementById("ruleta");
+    for (var i = 0; i < items.length; i++) {
+      var s = document.createElement("span");
+      s.textContent = items[i].titulo;
+      s.style.transform = "rotate(" + (i * 72 - 54) + "deg)";
+      s.style.animationDelay = (i * 0.3) + "s";
+      r.appendChild(s);
+    }
+  }
+  function angulo(e,r) {
+    var b= r.getBoundingClientRect();
+    var cx= b.left + b.width / 2;
+    var cy= b.top + b.height / 2;
+    return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+  }
+  function indice () {
+    var cur= (((90 - rot )% 360)+360) %360;
+    return Math.floor(cur / 72);
+  }
+  function marcar () {
+    var s= document.querySelectorAll("#ruleta span");
+    var n= indice ();
+    for (var i = 0; i < s.length; i++) {
+      s[i]. classList.toggle ("activo", i === n);
+    }
+  }
+  
+  function reproducir(archivo) {
+    if (sonido) {
+      sonido.pause();
+      sonido = null;
+    }
+    if (archivo) {
+      sonido = new Audio(archivo);
+      sonido.loop = true;
+      sonido.play().catch(function () {});
+    }
+  }
+
+  function abrirCarta() {
+    var c= document.getElementById("textoCarta");
+    if (c.style.display === "block") {
+      c.style.display= "none";
+    }else {
+      c.style.display= "block";
+       }
+    }
+
+  function elegir(n) {
+    var p = document.getElementById("pantalla");
+    var info = document.getElementById("info");
+    var it = items[n];
+    reproducir(it.audio);
+    p.style.backgroundColor = it.fondo;
+    if (it.imagen) {
+      p.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url(" + it.imagen + ")";
+      p.style.backgroundSize = "cover";
+      p.style.backgroundPosition = "center";
+    } else {
+      p.style.backgroundImage = "none";
+    }
+    info.style.opacity = 0;
+    setTimeout(function () {
+      var html = it.texto;
+      if (it.link) {
+        html += '<br><a href="' + it.link + '" target="_blank">▶ Escuchar en Spotify</a>';
+      }
+      info.innerHTML = html;
+      info.style.opacity = 1;
+    }, 300);
+  }
+
+  function soltar() {
+    if (!arrastrando) return;
+    arrastrando = false;
+    var r = document.getElementById("ruleta");
+    var cur = (((90 - rot) % 360) + 360) % 360;
+    var n = Math.floor(cur / 72);
+    rot += cur - (n * 72 + 36);
+    r.style.transition = "transform 0.4s ease";
+    r.style.transform = "rotate(" + rot + "deg)";
+    marcar();
+    elegir(n);
+  }
+
+  function activarRuleta() {
+    var r = document.getElementById("ruleta");
+    rot = 54;
+    r.style.transform = "rotate(" + rot + "deg)";
+    marcar();
+    r.addEventListener("pointerdown", function (e) {
+      arrastrando = true;
+      r.setPointerCapture(e.pointerId);
+      r.style.transition = "none";
+      ultimo = angulo(e, r);
+    });
+    r.addEventListener("pointermove", function (e) {
+      if (!arrastrando) return;
+      var a = angulo(e, r);
+      var d = a - ultimo;
+      if (d > 180) d -= 360;
+      if (d < -180) d += 360;
+      rot += d;
+      ultimo = a;
+      r.style.transform = "rotate(" + rot + "deg)";
+      marcar();
+    });
+    r.addEventListener("pointerup", soltar);
+    r.addEventListener("pointercancel", soltar);
+  }
+</script>
